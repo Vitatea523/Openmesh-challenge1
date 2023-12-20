@@ -21,6 +21,11 @@ contract QueryProcessor {
     string result;
     // List of query operations submitted by users
     QueryOperation[] public queryOperations;
+    IDataQuery public dataQuery;  // Added variable to store DataQuery contract address
+
+    constructor(address _dataQueryAddress) {
+        dataQuery = IDataQuery(_dataQueryAddress);
+    }
 
     // The function that executes the query
     function executeQuery(uint _queryNums) internal {
@@ -44,7 +49,7 @@ contract QueryProcessor {
     function getData(string[] memory _parameter) internal {
         
         // TODO: Simulate calls to other contracts to get data
-        string memory _result = IDataQuery(_dataQueryAddress).getData(_parameter);
+        string memory _result = dataQuery.getData(_parameter);
 
         // Process the obtained data, which can be performed according to the actual situation
         processResult(_result);
@@ -53,7 +58,7 @@ contract QueryProcessor {
         executeQuery(queryNums + 1);
     }
 
-    // 选择字段的函数
+    // select fields
     function select(string[] memory fields) internal {
         // Simulates the selection of data from a specified field in a data set
         string memory _result = selectFields(fields);

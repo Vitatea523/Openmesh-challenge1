@@ -14,46 +14,47 @@ contract DataQuery is IDataQuery {
     event QueryResult(string result);
     
 
-    // Chainlink ETH/USD价格聚合器地址
+    // Chainlink ETH/USD Address of the price aggregator
     AggregatorV3Interface internal priceFeed;
     string public data;
 
-    // 构造函数，初始化 Chainlink ETH/USD价格聚合器地址
+    // Constructor that initializes the Chainlink ETH/USD price aggregator address
     constructor() {
         priceFeed = AggregatorV3Interface(0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419);
     }
 
-    // 获取数据的函数
-    function getData(string memory _parameter) external {
+    // A function to get data
+    function getData(string memory _parameter) external returns (string memory){
         if (isOnChain) {
-            // 如果是链上数据，直接返回链上数据
+            //TODO
+            // If it is on-chain data, return the on-chain data directly
             data = getOnChainData();
         } else {
-            // 如果是链下数据，通过 Chainlink 获取 ETH/USD 价格
+            //TODO
+            // If it is off-chain data, the ETH/USD price is obtained via Chainlink
             data = getOffChainData();
         }
-        // 触发事件通知结果
+        // Trigger event notification result
         emit QueryResult(data);
+        return data; 
     }
 
-
-    // 获取链上数据的示例函数
+    // Sample function to get on-chain data
     function getOnChainData() internal view returns (string memory) {
-        // 这里可以添加具体的链上数据查询逻辑
-        // 返回链上数据
+        // Here you can add specific on-chain data query logic
+        // Returns on-chain data
         return "On-chain data";
     }
 
-    // 获取链下数据的示例函数（使用 Chainlink 获取 ETH/USD 价格）
+    // Example function to get data off chain (use Chainlink to get ETH/USD price)
     function getOffChainData() internal view returns (string memory) {
-        // 通过 Chainlink 获取 ETH/USD 价格
+        // Get the ETH/USD price via Chainlink
         (, int256 price, , , ) = priceFeed.latestRoundData();
-
-        // 将整数价格转换为字符串
+        // Converts integer prices to strings
         return integerToString(uint256(price));
     }
 
-    // 辅助函数：将整数转换为字符串
+    // Helper function: Converts integers to strings
     function integerToString(uint256 value) internal pure returns (string memory) {
         if (value == 0) {
             return "0";
