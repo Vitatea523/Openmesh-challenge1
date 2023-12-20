@@ -22,13 +22,21 @@ contract QueryProcessor {
     // List of query operations submitted by users
     QueryOperation[] public queryOperations;
     IDataQuery public dataQuery;  // Added variable to store DataQuery contract address
+    using JSONParser for string;
+    address public owner;
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Permission denied");
+        _; // Continue with the function execution if the modifier check passes
+    }
 
     constructor(address _dataQueryAddress) {
         dataQuery = IDataQuery(_dataQueryAddress);
+        owner = msg.sender;
     }
 
     // The function that executes the query
-    function executeQuery(uint _queryNums) internal {
+    function executeQuery(uint _queryNums) internal onlyOwner {
         // End condition: Ends when queryNum is equal to the size of the query operation list
         if (_queryNums == queryOperations.length) {
             emit QueryResult(result);
@@ -50,6 +58,8 @@ contract QueryProcessor {
         
         // TODO: Simulate calls to other contracts to get data
         string memory _result = dataQuery.getData(_parameter);
+        require(bytes(_result).length > 0, "Data cannot be empty");
+        require(_result.isValidJson(), "Invalid JSON data");
 
         // Process the obtained data, which can be performed according to the actual situation
         processResult(_result);
@@ -62,7 +72,7 @@ contract QueryProcessor {
     function select(string[] memory fields) internal {
         // Simulates the selection of data from a specified field in a data set
         string memory _result = selectFields(fields);
-
+        
         processResult(_result);
 
         executeQuery(queryNums + 1);
